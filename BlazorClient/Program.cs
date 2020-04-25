@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.Extensions.Configuration;
 
 namespace BlazorClient
 {
@@ -14,14 +17,22 @@ namespace BlazorClient
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
 
-            builder.Services.AddBaseAddressHttpClient();
+            builder.Services.AddHttpClient("api")
+                .AddHttpMessageHandler(sp => 
+                {
+                    var handler = sp.GetService<AuthorizationMessageHandler>()
+                        .ConfigureHandler(
+                            authorizedUrls: new[] { "https://localhost:5002" },
+                            scopes: new[] { "weatherapi" });
+
+                    return handler;
+                });
+            
+            builder.Services.AddScoped(sp => sp.GetService<IHttpClientFactory>().CreateClient("api"));
+
             builder.Services.AddOidcAuthentication(options =>
             {
-                options.ProviderOptions.Authority = "https://localhost:5000/";
-                options.ProviderOptions.ClientId = "blazor";
-                options.ProviderOptions.DefaultScopes = new List<string> { "openid", "profile", "email", "weatherapi" };
-                options.ProviderOptions.PostLogoutRedirectUri = "/";
-                options.ProviderOptions.ResponseType = "code";
+                builder.Configuration.Bind("oidc", options.ProviderOptions);
             });
 
             await builder.Build().RunAsync();

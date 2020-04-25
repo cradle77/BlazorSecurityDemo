@@ -1,6 +1,5 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
-@inject IAccessTokenProvider TokenProvider
 @attribute [Authorize]
 
 <h1>Weather forecast</h1>
@@ -41,14 +40,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var tokenRequest = await this.TokenProvider.RequestAccessToken();
-
-        if (tokenRequest.TryGetToken(out var token))
-        {
-            this.Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.Value}");
-
-            forecasts = await Http.GetJsonAsync<WeatherForecast[]>("https://localhost:5002/WeatherForecast");
-        }
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("https://localhost:5002/WeatherForecast");
     }
 
     public class WeatherForecast
