@@ -59,7 +59,8 @@ namespace IdentityProvider
                 })
                 .AddInMemoryIdentityResources(Config.Ids)
                 .AddInMemoryApiResources(Config.Apis)
-                .AddInMemoryClients(Config.Clients)
+                //.AddInMemoryClients(Config.Clients)
+                .AddInMemoryClients(Configuration.GetSection("Clients"))
                 .AddAspNetIdentity<ApplicationUser>();
 
             // not recommended for production - you need to store your key material somewhere secure
