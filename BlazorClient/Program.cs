@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text;
+using BlazorClient.Security;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 
 namespace BlazorClient
 {
@@ -18,7 +16,7 @@ namespace BlazorClient
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddHttpClient("api")
-                .AddHttpMessageHandler(sp => 
+                .AddHttpMessageHandler(sp =>
                 {
                     var handler = sp.GetService<AuthorizationMessageHandler>()
                         .ConfigureHandler(
@@ -27,13 +25,14 @@ namespace BlazorClient
 
                     return handler;
                 });
-            
+
             builder.Services.AddScoped(sp => sp.GetService<IHttpClientFactory>().CreateClient("api"));
 
             builder.Services.AddOidcAuthentication(options =>
             {
                 builder.Configuration.Bind("oidc", options.ProviderOptions);
-            });
+                options.UserOptions.RoleClaim = "role";
+            }).AddAccountClaimsPrincipalFactory<RolesClaimsFactory>();
 
             await builder.Build().RunAsync();
         }
