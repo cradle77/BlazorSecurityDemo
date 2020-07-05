@@ -14,6 +14,8 @@ namespace IdentityProvider
             new IdentityResource[]
             {
                 new IdentityResources.OpenId(),
+
+                // let's include the role claim in the profile
                 new ProfileWithRoleIdentityResource(),
                 new IdentityResources.Email()
             };
@@ -22,6 +24,7 @@ namespace IdentityProvider
         public static IEnumerable<ApiResource> Apis =>
             new ApiResource[]
             {
+                // the api requires the role claim
                 new ApiResource("weatherapi", "The Weather API", new[] { JwtClaimTypes.Role })
             };
 

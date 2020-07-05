@@ -28,11 +28,13 @@ namespace BlazorClient
 
             builder.Services.AddScoped(sp => sp.GetService<IHttpClientFactory>().CreateClient("api"));
 
-            builder.Services.AddOidcAuthentication(options =>
-            {
-                builder.Configuration.Bind("oidc", options.ProviderOptions);
-                options.UserOptions.RoleClaim = "role";
-            }).AddAccountClaimsPrincipalFactory<RolesClaimsFactory>();
+            builder.Services
+                .AddOidcAuthentication(options =>
+                {
+                    builder.Configuration.Bind("oidc", options.ProviderOptions);
+                    options.UserOptions.RoleClaim = "role";
+                })
+                .AddAccountClaimsPrincipalFactory<ArrayClaimsPrincipalFactory<RemoteUserAccount>>();
 
             await builder.Build().RunAsync();
         }
