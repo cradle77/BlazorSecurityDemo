@@ -6,6 +6,8 @@ This project demonstrates how to secure a Blazor WebAssembly application with a 
 
 Please refer to [my article on Medium](https://medium.com/@marcodesanctis2/securing-blazor-webassembly-with-identity-server-4-ee44aa1687ef) for more details.
 
+> Note: as any other Blazor WASM applications, `appsettings.json` must be placed in your `wwwroot` folder.
+
 ## How to run the demo
 
 The only requirement in order to run the demo is making sure you run all the projects. My recommendation is to set it up in the solution options:
