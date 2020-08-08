@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -28,12 +30,14 @@ namespace BlazorClient
 
             builder.Services.AddScoped(sp => sp.GetService<IHttpClientFactory>().CreateClient("api"));
 
-            builder.Services
-                .AddOidcAuthentication(options =>
-                {
-                    builder.Configuration.Bind("oidc", options.ProviderOptions);
-                    options.UserOptions.RoleClaim = "role";
-                })
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IPostConfigureOptions<RemoteAuthenticationOptions<ExtendedOidcProviderOptions>>, DefaultOidcOptionsConfiguration<ExtendedOidcProviderOptions>>());
+
+            builder.Services.AddRemoteAuthentication<RemoteAuthenticationState, RemoteUserAccount, ExtendedOidcProviderOptions>(options =>
+            {
+                builder.Configuration.Bind("oidc", options.ProviderOptions);
+                options.UserOptions.RoleClaim = "role";
+                options.ProviderOptions.AcrValues = "tenant:mytenant";
+            })
                 .AddAccountClaimsPrincipalFactory<ArrayClaimsPrincipalFactory<RemoteUserAccount>>();
 
             await builder.Build().RunAsync();
